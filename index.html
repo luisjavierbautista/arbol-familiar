@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Árbol Bautista Russy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#F4F5F2; --surface:#FFFFFF; --ink:#1A2129; --muted:#56606B; --rule:#D8DCD4;
+  --accent:#22508F; --accent-soft:#E6EDF6;
+  --ok:#2C7A4C; --ok-soft:#E4F1E8; --warn:#9A620E; --warn-soft:#F6ECD9; --no:#A13A2F; --no-soft:#F5E3E0;
+  --display:"Bodoni Moda","Didot",Georgia,serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#12161B; --surface:#1A2027; --ink:#E6E9EC; --muted:#9AA4AE; --rule:#2E3640;
+    --accent:#8DB3E8; --accent-soft:#1D2A3B;
+    --ok:#7CC79A; --ok-soft:#18291F; --warn:#E0B065; --warn-soft:#2E2515; --no:#EB8F83; --no-soft:#331D1A;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12161B; --surface:#1A2027; --ink:#E6E9EC; --muted:#9AA4AE; --rule:#2E3640;
+  --accent:#8DB3E8; --accent-soft:#1D2A3B;
+  --ok:#7CC79A; --ok-soft:#18291F; --warn:#E0B065; --warn-soft:#2E2515; --no:#EB8F83; --no-soft:#331D1A;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;padding-inline:20px;padding-block:0 72px}
+a{color:var(--accent);text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+.wrap{max-width:980px;margin:0 auto}
+header{padding-block:44px 28px;border-bottom:1px solid var(--rule);margin-bottom:36px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(38px,6.5vw,62px);line-height:1.03;margin:10px 0 14px;letter-spacing:-.01em;text-wrap:balance}
+.lede{font-size:18.5px;max-width:62ch;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:18px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:clamp(26px,4vw,34px);line-height:1.1;margin:0 0 6px;text-wrap:balance}
+h3{font-size:17px;font-weight:700;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px;max-width:65ch}
+section{padding-bottom:36px;border-bottom:1px solid var(--rule);margin-bottom:36px}
+section:last-of-type{border-bottom:0}
+p,li{max-width:68ch}
+ul,ol{padding-left:22px}
+li+li{margin-top:6px}
+
+figure{margin:0}
+.scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--rule);padding:14px}
+.scroll svg{display:block;width:960px;max-width:none;height:auto}
+figcaption{color:var(--muted);font-size:14px;margin-top:10px;max-width:70ch}
+.tree-name{font-family:var(--body);font-size:13px;font-weight:700}
+.tree-sub{font-family:var(--mono);font-size:10.5px}
+.tree-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;margin:14px 0 0;padding:0;list-style:none;font-size:13.5px;color:var(--muted)}
+.legend li{display:flex;align-items:center;gap:8px;max-width:none}
+.legend li+li{margin-top:0}
+.swatch{width:26px;height:0;border-top:2px solid var(--muted);flex:none}
+.swatch.dash{border-top-style:dashed}
+.swatch.box{height:14px;border:1px solid var(--muted)}
+.swatch.box.acc{border-color:var(--accent);border-width:2px}
+
+.branches{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;margin-top:22px}
+.branch{background:var(--surface);border:1px solid var(--rule);border-top:3px solid var(--rule);padding:16px 18px;display:grid;gap:8px;align-content:start}
+.branch.done{border-top-color:var(--accent)}
+.branch h3{margin:0}
+.branch p{margin:0;font-size:15px}
+.branch ul{margin:0;padding-left:20px;font-size:14.5px;color:var(--muted)}
+
+.gens{display:grid;gap:12px;margin-top:22px}
+.gen{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--rule);padding:14px 16px;display:grid;gap:6px}
+.gen.key{border-left-color:var(--accent)}
+.gen .who{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px}
+.gen .yr{font-family:var(--mono);font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.gen p{margin:0;font-size:15px}
+.gen .todo{font-size:14.5px;color:var(--muted)}
+.gen .todo b{color:var(--ink)}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.no{background:var(--no-soft);color:var(--no)}
+
+.note{border:1px solid var(--rule);background:var(--surface);padding:16px 18px;margin:20px 0;max-width:68ch}
+.note.acc{border-color:var(--accent);background:var(--accent-soft)}
+.note b:first-child{display:block;margin-bottom:4px}
+.mono{font-family:var(--mono);font-size:.92em}
+
+.asks{display:grid;gap:10px;margin:20px 0 0;padding:0;list-style:none}
+.asks li{background:var(--surface);border:1px solid var(--rule);padding:12px 16px;max-width:none}
+.asks li+li{margin-top:0}
+.asks b{display:block}
+
+.table-wrap{overflow-x:auto;border:1px solid var(--rule);background:var(--surface);margin:20px 0}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:15px}
+th,td{text-align:left;vertical-align:top;padding:11px 14px;border-bottom:1px solid var(--rule)}
+thead th{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;background:var(--paper)}
+tbody tr:last-child td{border-bottom:0}
+footer{max-width:980px;margin:0 auto;font-size:13.5px;color:var(--muted);border-top:1px solid var(--rule);padding-block:22px}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Genealogía familiar · Boyacá — Bogotá</div>
+  <h1>Árbol Bautista Russy</h1>
+  <p class="lede">El árbol arranca en los hijos Bautista Russy y sube por las dos ramas. La materna llega a 1880 en el occidente de Boyacá; la paterna llega a Pesca, en el oriente del mismo departamento, y se corta en una paternidad que nadie reconoció.</p>
+  <div class="meta"><span>Armado el 26-sep-2026</span><span>Rama Russy: genealogiasdecolombia.co</span><span>Ramas Velandia, Bautista y Méndez: aporte familiar</span><span>Sin partidas originales todavía</span></div>
+</header>
+
+<section>
+  <div class="eyebrow">El árbol</div>
+  <h2>Cómo va hasta hoy</h2>
+  <p class="sub">Primero los hijos y sus cuatro abuelos; después la rama materna en profundidad. Punteado es lo que falta documentar.</p>
+
+  <figure>
+    <div class="scroll">
+      <svg viewBox="0 0 900 400" role="img" aria-label="Los hijos Bautista Russy descienden de Luis Javier Bautista y Viviana Russy Velandia; los abuelos maternos son Kalman Russy Casallas y Gloria Velandia; los paternos, Luis Antonio Bautista y Luz Mery Méndez.">
+        <defs>
+          <marker id="tip1" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+            <polygon points="0,0 8,4 0,8" fill="currentColor"></polygon>
+          </marker>
+        </defs>
+        <g stroke="var(--accent)" fill="none" stroke-width="2">
+          <rect x="40" y="30" width="180" height="52" rx="2"></rect>
+          <rect x="250" y="30" width="180" height="52" rx="2"></rect>
+          <rect x="145" y="180" width="200" height="52" rx="2"></rect>
+        </g>
+        <g stroke="currentColor" fill="none">
+          <rect x="520" y="30" width="160" height="52" rx="2"></rect>
+          <rect x="700" y="30" width="160" height="52" rx="2"></rect>
+          <path d="M680 54 L700 54"></path><path d="M680 60 L700 60"></path>
+          <path d="M690 82 L690 148 L640 148 L640 178"></path>
+        </g>
+        <g stroke="currentColor" fill="none">
+          <rect x="540" y="180" width="200" height="52" rx="2"></rect>
+          <rect x="332" y="318" width="220" height="52" rx="2"></rect>
+          <path d="M220 54 L250 54"></path><path d="M220 60 L250 60"></path>
+          <path d="M235 82 L235 148 L245 148 L245 178"></path>
+          <path d="M345 204 L540 204"></path><path d="M345 210 L540 210"></path>
+          <path d="M442 232 L442 312" marker-end="url(#tip1)"></path>
+        </g>
+        <g fill="currentColor">
+          <text class="tree-name" x="130" y="52" text-anchor="middle">Kalman Russy Casallas</text>
+          <text class="tree-sub" x="130" y="69" text-anchor="middle" opacity=".7">abuelo materno</text>
+          <text class="tree-name" x="340" y="52" text-anchor="middle">Gloria Velandia</text>
+          <text class="tree-sub" x="340" y="69" text-anchor="middle" opacity=".7">abuela materna</text>
+          <text class="tree-name" x="600" y="52" text-anchor="middle">Luis Antonio Bautista</text>
+          <text class="tree-sub" x="600" y="69" text-anchor="middle" opacity=".7">abuelo paterno</text>
+          <text class="tree-name" x="780" y="52" text-anchor="middle">Luz Mery Méndez</text>
+          <text class="tree-sub" x="780" y="69" text-anchor="middle" opacity=".7">abuela paterna</text>
+          <text class="tree-name" x="245" y="202" text-anchor="middle">Viviana Russy Velandia</text>
+          <text class="tree-sub" x="245" y="219" text-anchor="middle" opacity=".7">hija de Kalman y Gloria</text>
+          <text class="tree-name" x="640" y="202" text-anchor="middle">Luis Javier Bautista</text>
+          <text class="tree-sub" x="640" y="219" text-anchor="middle" opacity=".7">Bogotá</text>
+          <text class="tree-name" x="442" y="340" text-anchor="middle">Hijos Bautista Russy</text>
+          <text class="tree-sub" x="442" y="357" text-anchor="middle" opacity=".7">nombres y fechas por completar</text>
+        </g>
+      </svg>
+    </div>
+    <ul class="legend">
+      <li><span class="swatch box acc"></span>Rama materna, con datos</li>
+      <li><span class="swatch box"></span>Persona identificada</li>
+      <li><span class="swatch dash"></span>Por documentar</li>
+      <li><span class="swatch"></span>Doble raya = matrimonio</li>
+    </ul>
+    <figcaption>Cada hijo lleva las dos ramas en su nombre: <span class="mono">Bautista</span> por el padre y <span class="mono">Russy</span> por la madre. Los cuatro abuelos ya tienen nombre, y de cada uno sube por lo menos una generación más.</figcaption>
+  </figure>
+
+  <h3 style="margin-top:36px">La rama materna, cuatro generaciones</h3>
+  <p class="sub">Los dos apellidos de tu esposa suben por familias de la misma zona de Boyacá.</p>
+  <figure>
+    <div class="scroll">
+      <svg viewBox="0 0 1200 540" style="width:1200px" role="img" aria-label="Ancestros de Viviana Russy Velandia: por el padre, Kalman Russy Casallas, hijo de Germán Russy Morales y Rosa Ismenia Casallas Sáenz, nietos de Crisóstomo Russy con Herminia Morales y de Alcides Casallas con Sara Sáenz. Por la madre, Gloria Velandia, hija de Carlos Arturo Velandia Bernal y Luisa Delia Roncancio Velandia, cuyos padres están por documentar.">
+        <defs>
+          <marker id="tip2" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+            <polygon points="0,0 8,4 0,8" fill="currentColor"></polygon>
+          </marker>
+        </defs>
+
+        <!-- Bisabuelos -->
+        <g stroke="var(--accent)" fill="none" stroke-width="2">
+          <rect x="30" y="30" width="170" height="52" rx="2"></rect>
+        </g>
+        <g stroke="currentColor" fill="none">
+          <rect x="215" y="30" width="170" height="52" rx="2"></rect>
+          <rect x="400" y="30" width="210" height="52" rx="2"></rect>
+          <path d="M200 54 L215 54"></path><path d="M200 60 L215 60"></path>
+          <path d="M207 82 L207 140 L115 140 L115 166"></path>
+          <path d="M505 82 L505 140 L425 140 L425 166"></path>
+        </g>
+        <g stroke="currentColor" fill="none" stroke-dasharray="5 4" opacity=".6">
+          <rect x="700" y="30" width="210" height="52" rx="2"></rect>
+          <path d="M805 82 L805 140 L780 140 L780 166"></path>
+        </g>
+        <g stroke="var(--accent)" fill="none" stroke-width="2">
+          <rect x="940" y="30" width="230" height="52" rx="2"></rect>
+          <path d="M1055 82 L1055 140 L1050 140 L1050 166"></path>
+        </g>
+        <g fill="currentColor">
+          <text class="tree-name" x="115" y="52" text-anchor="middle">Crisóstomo Russy</text>
+          <text class="tree-sub" x="115" y="69" text-anchor="middle" opacity=".7">~1880 · ¿nacido dónde?</text>
+          <text class="tree-name" x="300" y="52" text-anchor="middle">Herminia Morales</text>
+          <text class="tree-sub" x="300" y="69" text-anchor="middle" opacity=".7">~1890</text>
+          <text class="tree-name" x="505" y="52" text-anchor="middle">Alcides Casallas ═ Sara Sáenz</text>
+          <text class="tree-sub" x="505" y="69" text-anchor="middle" opacity=".7">fechas desconocidas</text>
+          <text class="tree-name" x="805" y="52" text-anchor="middle" opacity=".8">Velandia · Bernal</text>
+          <text class="tree-sub" x="805" y="69" text-anchor="middle" opacity=".7">por documentar</text>
+          <text class="tree-name" x="1055" y="52" text-anchor="middle">Pablo E. Roncancio ═ Eva Velandia</text>
+          <text class="tree-sub" x="1055" y="69" text-anchor="middle" opacity=".7">Togüí, Boyacá · ver abajo</text>
+        </g>
+
+        <!-- Abuelos -->
+        <g stroke="var(--accent)" fill="none" stroke-width="2">
+          <rect x="30" y="170" width="170" height="52" rx="2"></rect>
+        </g>
+        <g stroke="currentColor" fill="none">
+          <rect x="330" y="170" width="190" height="52" rx="2"></rect>
+          <rect x="670" y="170" width="220" height="52" rx="2"></rect>
+          <rect x="930" y="170" width="240" height="52" rx="2"></rect>
+          <path d="M200 194 L330 194"></path><path d="M200 200 L330 200"></path>
+          <path d="M265 222 L265 280 L115 280 L115 306"></path>
+          <path d="M890 194 L930 194"></path><path d="M890 200 L930 200"></path>
+          <path d="M910 222 L910 306"></path>
+        </g>
+        <g fill="currentColor">
+          <text class="tree-name" x="115" y="192" text-anchor="middle">Germán Russy Morales</text>
+          <text class="tree-sub" x="115" y="209" text-anchor="middle" opacity=".7">~1915</text>
+          <text class="tree-name" x="425" y="192" text-anchor="middle">Rosa I. Casallas Sáenz</text>
+          <text class="tree-sub" x="425" y="209" text-anchor="middle" opacity=".7">~1920</text>
+          <text class="tree-name" x="780" y="192" text-anchor="middle">Carlos Arturo Velandia Bernal</text>
+          <text class="tree-sub" x="780" y="209" text-anchor="middle" opacity=".7">fechas desconocidas</text>
+          <text class="tree-name" x="1050" y="192" text-anchor="middle">Luisa Delia Roncancio Velandia</text>
+          <text class="tree-sub" x="1050" y="209" text-anchor="middle" opacity=".7">fechas desconocidas</text>
+        </g>
+
+        <!-- Padres -->
+        <g stroke="var(--accent)" fill="none" stroke-width="2">
+          <rect x="30" y="310" width="170" height="52" rx="2"></rect>
+          <rect x="820" y="310" width="180" height="52" rx="2"></rect>
+          <rect x="440" y="450" width="200" height="52" rx="2"></rect>
+        </g>
+        <g stroke="currentColor" fill="none">
+          <path d="M200 334 L820 334"></path><path d="M200 340 L820 340"></path>
+          <path d="M510 362 L510 420 L540 420 L540 446" marker-end="url(#tip2)"></path>
+        </g>
+        <g fill="currentColor">
+          <text class="tree-name" x="115" y="332" text-anchor="middle">Kalman Russy Casallas</text>
+          <text class="tree-sub" x="115" y="349" text-anchor="middle" opacity=".7">Bogotá · año por confirmar</text>
+          <text class="tree-name" x="910" y="332" text-anchor="middle">Gloria Velandia</text>
+          <text class="tree-sub" x="910" y="349" text-anchor="middle" opacity=".7">segundo apellido por confirmar</text>
+          <text class="tree-name" x="540" y="472" text-anchor="middle">Viviana Russy Velandia</text>
+          <text class="tree-sub" x="540" y="489" text-anchor="middle" opacity=".7">Bogotá</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Arriba los bisabuelos, en el medio los abuelos, abajo los padres. La rama Russy sube una generación más (los Russi de Sutamarchán, ~1735, todavía sin enlace probado); la Velandia se corta en Carlos Arturo y Luisa Delia.</figcaption>
+  </figure>
+
+  <div class="note acc">
+    <b>Velandia y Roncancio: los mismos apellidos de los Russi coloniales</b>
+    Los registros más antiguos de la zona son <span class="mono">Thomas Antonio Russi <b>Velandia</b></span> (Sutamarchán, 1791) y <span class="mono">Cristóbal Russi c. Salomé <b>Roncancio</b></span> (~1735). Las dos ramas de tu esposa salen del mismo puñado de familias de Sutamarchán, Santa Sofía y Villa de Leyva, que llevaban siglos casándose entre ellas. Refuerza el origen boyacense y hace aún menos probable un inmigrante italiano reciente.
+  </div>
+
+
+  <h3 style="margin-top:36px">La rama de Togüí, hasta los tatarabuelos de Viviana</h3>
+  <p class="sub">Todo esto salió de una sola hoja: la partida de bautismo de Blanca Cecilia, <b>tía abuela</b> de Viviana, expedida en Togüí en 1966.</p>
+  <figure>
+    <div class="scroll">
+      <svg viewBox="0 0 1100 540" style="width:1100px" role="img" aria-label="Rama Roncancio-Velandia de Togüí, Boyacá: Clemente Roncancio y Vitalia Blanco, y Francisco Velandia y Ermelinda Franco, son los padres de Pablo Emilio Roncancio y Eva Velandia; hijas de estos son Luisa Delia Roncancio Velandia y Blanca Cecilia, nacida en 1932; Luisa Delia casó con Carlos Arturo Velandia Bernal y de ellos nació Gloria Velandia.">
+        <defs>
+          <marker id="tip4" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+            <polygon points="0,0 8,4 0,8" fill="currentColor"></polygon>
+          </marker>
+        </defs>
+
+        <g stroke="var(--accent)" fill="none" stroke-width="2">
+          <rect x="40" y="30" width="180" height="52" rx="2"></rect>
+          <rect x="250" y="30" width="170" height="52" rx="2"></rect>
+          <rect x="600" y="30" width="180" height="52" rx="2"></rect>
+          <rect x="810" y="30" width="180" height="52" rx="2"></rect>
+          <rect x="145" y="170" width="190" height="52" rx="2"></rect>
+          <rect x="700" y="170" width="170" height="52" rx="2"></rect>
+          <rect x="60" y="310" width="210" height="52" rx="2"></rect>
+          <rect x="330" y="310" width="200" height="52" rx="2"></rect>
+          <rect x="207" y="450" width="180" height="52" rx="2"></rect>
+        </g>
+        <g stroke="currentColor" fill="none">
+          <rect x="620" y="310" width="250" height="52" rx="2"></rect>
+          <path d="M220 54 L250 54"></path><path d="M220 60 L250 60"></path>
+          <path d="M780 54 L810 54"></path><path d="M810 60 L780 60"></path>
+          <path d="M235 82 L235 140 L240 140 L240 166"></path>
+          <path d="M795 82 L795 140 L785 140 L785 166"></path>
+          <path d="M335 194 L700 194"></path><path d="M335 200 L700 200"></path>
+          <path d="M517 222 L517 280"></path>
+          <path d="M430 280 L745 280"></path>
+          <path d="M430 280 L430 306"></path>
+          <path d="M745 280 L745 306"></path>
+          <path d="M270 334 L330 334"></path><path d="M270 340 L330 340"></path>
+          <path d="M297 362 L297 446" marker-end="url(#tip4)"></path>
+        </g>
+        <g fill="currentColor">
+          <text class="tree-name" x="130" y="52" text-anchor="middle">Clemente Roncancio</text>
+          <text class="tree-sub" x="130" y="69" text-anchor="middle" opacity=".7">tatarabuelo · sin fechas</text>
+          <text class="tree-name" x="335" y="52" text-anchor="middle">Vitalia Blanco</text>
+          <text class="tree-sub" x="335" y="69" text-anchor="middle" opacity=".7">tatarabuela · sin fechas</text>
+          <text class="tree-name" x="690" y="52" text-anchor="middle">Francisco Velandia</text>
+          <text class="tree-sub" x="690" y="69" text-anchor="middle" opacity=".7">tatarabuelo · sin fechas</text>
+          <text class="tree-name" x="900" y="52" text-anchor="middle">Ermelinda Franco</text>
+          <text class="tree-sub" x="900" y="69" text-anchor="middle" opacity=".7">tatarabuela · sin fechas</text>
+          <text class="tree-name" x="240" y="192" text-anchor="middle">Pablo Emilio Roncancio</text>
+          <text class="tree-sub" x="240" y="209" text-anchor="middle" opacity=".7">bisabuelo · Togüí</text>
+          <text class="tree-name" x="785" y="192" text-anchor="middle">Eva Velandia</text>
+          <text class="tree-sub" x="785" y="209" text-anchor="middle" opacity=".7">bisabuela · Togüí</text>
+          <text class="tree-name" x="165" y="332" text-anchor="middle">Carlos A. Velandia Bernal</text>
+          <text class="tree-sub" x="165" y="349" text-anchor="middle" opacity=".7">abuelo de Viviana</text>
+          <text class="tree-name" x="430" y="332" text-anchor="middle">Luisa Delia Roncancio V.</text>
+          <text class="tree-sub" x="430" y="349" text-anchor="middle" opacity=".7">abuela de Viviana</text>
+          <text class="tree-name" x="745" y="332" text-anchor="middle">Blanca Cecilia Roncancio V.</text>
+          <text class="tree-sub" x="745" y="349" text-anchor="middle" opacity=".7">tía abuela · n. 4-sep-1932</text>
+          <text class="tree-name" x="297" y="472" text-anchor="middle">Gloria Velandia</text>
+          <text class="tree-sub" x="297" y="489" text-anchor="middle" opacity=".7">madre de Viviana</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Los parentescos están vistos desde Viviana. Blanca Cecilia no es antepasada suya: es la hermana de su abuela Luisa Delia, y su partida es la que tenemos. Las partidas colombianas nombran a los cuatro abuelos del bautizado, y por eso una hoja de 1933 alcanza para tres generaciones.</figcaption>
+  </figure>
+
+  <div class="note acc">
+    <b>La primera partida real del árbol</b>
+    Hasta ahora todo venía de un árbol compilado sin fuentes. Esta hoja es distinta: es una copia certificada, expedida en Togüí el 21 de marzo de 1966, del Libro 21 de Bautismos, página 21. Nombra a los padres y a los cuatro abuelos de Blanca Cecilia, y además trae <b>nota marginal</b> del matrimonio con Pedro José Estrada en Barbosa en 1961. Esas notas marginales son el mecanismo que encadena un documento con el siguiente: cada partida apunta a la próxima.
+  </div>
+
+  <div class="note">
+    <b>Los libros de Togüí no están en ninguna parte sino en la casa cural</b>
+    Revisé el catálogo del AGN parroquia por parroquia y la lista de FamilySearch: <b>Togüí no aparece en ninguna de las dos</b>, y tampoco Moniquirá, Chitaraque, Santana, Villa de Leyva ni Santa Sofía. De la provincia de Ricaurte no hay una sola parroquia microfilmada. Todo depende de la <b>Parroquia San Pablo de Togüí</b>, hoy de la Diócesis de Chiquinquirá. Como su página web está caída, el número se consigue por la curia: <span class="mono">(608) 726 2017</span> o <span class="mono">320 848 5179</span>.
+  </div>
+
+  <div class="note">
+    <b>Por qué el sello dice Tunja y hoy dice Chiquinquirá</b>
+    La Diócesis de Chiquinquirá se creó en 1977 con territorio desmembrado de la Arquidiócesis de Tunja. En 1966, cuando expidieron esta copia, Togüí sí era de Tunja: el sello es coherente y respalda la autenticidad del documento. Lo mismo explica la duda con Pesca, y con Barbosa: el matrimonio de 1961 se celebró cuando Barbosa era de Socorro y San Gil, y hoy es de la Diócesis de Vélez.
+  </div>
+
+  <h4 style="margin:28px 0 8px">Los siete registros por pedir en Togüí</h4>
+  <p class="sub">Citando siempre el ancla: <i>Blanca Cecilia Roncancio Velandia, Libro 21 de Bautismos, página 21, bautizada el 10 de enero de 1933</i>. Eso le prueba al párroco que la familia está en sus libros.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Registro</th><th>Rango por barrer</th></tr></thead>
+      <tbody>
+        <tr><td>Bautismo de <b>Luisa Delia Roncancio Velandia</b></td><td class="num">1925–1945 (empezar 1928–1940)</td></tr>
+        <tr><td>Matrimonio de <b>Pablo Emilio Roncancio × Eva Velandia</b></td><td class="num">1915–1932 (empezar 1920–1931)</td></tr>
+        <tr><td>Bautismo de <b>Pablo Emilio Roncancio</b></td><td class="num">1890–1912</td></tr>
+        <tr><td>Bautismo de <b>Eva Velandia</b></td><td class="num">1893–1915</td></tr>
+        <tr><td>Matrimonio de <b>Clemente Roncancio × Vitalia Blanco</b></td><td class="num">1880–1900</td></tr>
+        <tr><td>Matrimonio de <b>Francisco Velandia × Ermelinda Franco</b></td><td class="num">1883–1903</td></tr>
+        <tr><td>Matrimonio de <b>Carlos Arturo Velandia Bernal × Luisa Delia</b></td><td class="num">1945–1965</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note acc">
+    <b>Pidan la foto del folio, no solo el certificado</b>
+    El certificado mecanografiado transcribe la partida, pero <b>recorta las notas marginales</b>, y ahí está la mitad del valor: la de Blanca Cecilia anotó su matrimonio de 1961 en Barbosa. Si los bautismos de Pablo Emilio y Eva traen al margen su propio matrimonio, se ahorran barrer veinte años de libros. Así que pidan las dos cosas: la partida certificada con sello y una <b>fotografía del folio completo con márgenes</b>. Cuesta entre nada y $30.000 por partida; en parroquias rurales suele ser una limosna por Nequi.
+  </div>
+
+
+  <h3 style="margin-top:36px">La rama paterna, tres generaciones</h3>
+  <p class="sub">Del lado de Luis el árbol sube por Pesca (Boyacá) y por Bogotá, y se corta en un padre que nunca se reconoció.</p>
+  <figure>
+    <div class="scroll">
+      <svg viewBox="0 0 900 400" style="width:900px" role="img" aria-label="Ancestros de Luis: su padre Luis Antonio Bautista es hijo de María de la Columna Bautista, nacida en Pesca, Boyacá; el padre no fue reconocido y la tradición familiar menciona a un José Roa. Su madre Luz Mery Méndez es hija de Álvaro Méndez Cortés y Mary Mélida López, de Bogotá.">
+        <defs>
+          <marker id="tip3" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+            <polygon points="0,0 8,4 0,8" fill="currentColor"></polygon>
+          </marker>
+        </defs>
+
+        <g stroke="currentColor" fill="none" stroke-dasharray="5 4" opacity=".6">
+          <rect x="40" y="30" width="170" height="52" rx="2"></rect>
+          <path d="M210 57 L225 57"></path>
+        </g>
+        <g stroke="currentColor" fill="none">
+          <rect x="225" y="30" width="215" height="52" rx="2"></rect>
+          <rect x="490" y="30" width="185" height="52" rx="2"></rect>
+          <rect x="695" y="30" width="170" height="52" rx="2"></rect>
+          <path d="M675 54 L695 54"></path><path d="M675 60 L695 60"></path>
+          <path d="M332 82 L332 140 L215 140 L215 166"></path>
+          <path d="M685 82 L685 140 L640 140 L640 166"></path>
+          <rect x="130" y="170" width="170" height="52" rx="2"></rect>
+          <rect x="555" y="170" width="170" height="52" rx="2"></rect>
+          <path d="M300 194 L555 194"></path><path d="M300 200 L555 200"></path>
+          <path d="M427 222 L427 300" marker-end="url(#tip3)"></path>
+          <rect x="317" y="304" width="220" height="52" rx="2"></rect>
+        </g>
+        <g fill="currentColor">
+          <text class="tree-name" x="125" y="52" text-anchor="middle" opacity=".8">¿José Roa?</text>
+          <text class="tree-sub" x="125" y="69" text-anchor="middle" opacity=".7">sin reconocer · solo tradición oral</text>
+          <text class="tree-name" x="332" y="52" text-anchor="middle">María de la Columna Bautista</text>
+          <text class="tree-sub" x="332" y="69" text-anchor="middle" opacity=".7">Pesca, Boyacá · ~1913–1916 † 2009</text>
+          <text class="tree-name" x="582" y="52" text-anchor="middle">Álvaro Méndez Cortés</text>
+          <text class="tree-sub" x="582" y="69" text-anchor="middle" opacity=".7">Bogotá</text>
+          <text class="tree-name" x="780" y="52" text-anchor="middle">Mary Mélida López</text>
+          <text class="tree-sub" x="780" y="69" text-anchor="middle" opacity=".7">Bogotá</text>
+          <text class="tree-name" x="215" y="192" text-anchor="middle">Luis Antonio Bautista</text>
+          <text class="tree-sub" x="215" y="209" text-anchor="middle" opacity=".7">lleva el apellido de su madre</text>
+          <text class="tree-name" x="640" y="192" text-anchor="middle">Luz Mery Méndez López</text>
+          <text class="tree-sub" x="640" y="209" text-anchor="middle" opacity=".7">Bogotá</text>
+          <text class="tree-name" x="427" y="326" text-anchor="middle">Luis Javier Bautista Méndez</text>
+          <text class="tree-sub" x="427" y="343" text-anchor="middle" opacity=".7">Bogotá</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>La raya punteada de arriba a la izquierda es el único enlace del árbol que no descansa en nada escrito: el apellido Bautista baja de María de la Columna, no de un padre. Pesca queda en la provincia de Sugamuxi, a unos 150 km de Santa Sofía, al otro lado de Boyacá.</figcaption>
+  </figure>
+
+  <div class="note">
+    <b>El hueco de la paternidad se resuelve con ADN, no con papeles</b>
+    Aquí hay dos obstáculos que se suman: el padre nunca reconoció a Luis Antonio, y él se bautizó ya <b>de adulto</b>, así que no existe la partida de infancia donde los padrinos delatan a la familia del padre — en un bautizo de adulto los padrinos los elige el bautizado. Con una salvedad que vale la pena perseguir: el párroco igual tenía que anotar a los padres, según lo declarara el propio bautizado, así que esa partida podría ser el único papel donde alguien escribió el nombre del padre. Con una familia campesina muy pobre, es normal que casi no haya papeles de esos años. Lo que puede sostener o tumbar al José Roa es el ADN: una prueba <b>autosómica</b> hecha por tu papá (MyHeritage o Ancestry, entre unos 40 y 99 dólares según la temporada) mostraría primos segundos y terceros; si varios llevan Roa y son de Boyacá, la tradición se sostiene. Una prueba de <b>Y-ADN</b> en un varón de esa línea (desde unos 169 dólares) confirma o descarta el linaje paterno, y hay un proyecto COLOMBIA DNA donde comparar. Ninguna de las dos prueba que fuera <i>ese</i> José Roa: prueban el linaje, no la persona. Ojo con los envíos internacionales, que a veces no incluyen el retorno de la muestra. Y hay prisa: la prueba la debe hacer <b>tu papá</b>, porque cada generación que pasa diluye a la mitad la señal del abuelo.
+  </div>
+
+</section>
+
+<section>
+  <div class="eyebrow">El plan</div>
+  <h2>Las cuatro ramas</h2>
+  <p class="sub">Del lado materno ya hay cinco apellidos en movimiento; del paterno, ninguno todavía.</p>
+  <div class="branches">
+    <div class="branch done">
+      <h3>Russy <span class="pill ok">4 generaciones</span></h3>
+      <p>Kalman → Germán (~1915) → Crisóstomo (~1880), con Santa Sofía, Boyacá como centro de la familia.</p>
+      <ul><li>Falta: dónde nació Crisóstomo</li><li>Falta: partidas originales de todo</li></ul>
+    </div>
+    <div class="branch">
+      <h3>Casallas <span class="pill warn">2 generaciones</span></h3>
+      <p>Rosa Ismenia Casallas Sáenz (~1920), hija de Alcides Casallas y Sara Sáenz. Casallas está el 96 % en Colombia, con núcleo en Cundinamarca (28 %) y Bogotá, y apenas 5 % en Boyacá: Rosa Ismenia pudo llegar de otro municipio.</p>
+      <ul><li>Falta: municipio, segundos apellidos, y si “Alcides” era el nombre completo</li></ul>
+    </div>
+    <div class="branch done">
+      <h3>Velandia y Roncancio <span class="pill ok">Hasta tatarabuelos</span></h3>
+      <p>La rama mejor documentada, y la única con una partida real. De Gloria sube a Luisa Delia, a Pablo Emilio Roncancio y Eva Velandia, y de ahí a Clemente Roncancio con Vitalia Blanco y a Francisco Velandia con Ermelinda Franco. Todo en <b>Togüí, Boyacá</b>. Velandia viene del vasco Belandia (Vizcaya); Roncancio es casi exclusivo de Colombia.</p>
+      <ul><li>Entran dos apellidos nuevos: Blanco y Franco</li><li>Falta: fechas, y los padres de Carlos Arturo Velandia Bernal</li></ul>
+    </div>
+    <div class="branch done">
+      <h3>Bautista <span class="pill warn">2 generaciones + hueco</span></h3>
+      <p>Luis Antonio Bautista y su madre María de la Columna Bautista, <b>nacida hacia 1913–1916 en Pesca, Boyacá</b> y fallecida en <b>2009</b>. Pesca es pueblo de indios fundado en 1548, con libros parroquiales desde 1607. El padre de Luis Antonio nunca se reconoció; la familia menciona un José Roa.</p>
+      <ul><li>Empezar por: bautismos de Pesca 1904–1933 en FamilySearch, gratis, buscando 1913–1916</li><li>El documento clave: su registro civil de nacimiento extemporáneo, el único que nombra a los padres</li><li>Los apellidos indígenas documentados en Pesca son Tibocha, Piraján, Piracesba y Quijen: ni Bautista ni Roa aparecen allí</li><li>Roa viene de la villa de Roa (Burgos) y Colombia es el país con más Roa del mundo</li></ul>
+    </div>
+    <div class="branch done">
+      <h3>Méndez y López <span class="pill ok">3 generaciones</span></h3>
+      <p>Luz Mery Méndez López, hija de Álvaro Méndez Cortés y Mary Mélida López, los dos de Bogotá. Entran también los apellidos Cortés y López.</p>
+      <ul><li>Falta: años, parroquias de Bogotá y los padres de Álvaro y Mary Mélida</li></ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Rama Russy</div>
+  <h2>Qué está probado y qué falta</h2>
+  <p class="sub">Todo esto viene de un árbol compilado que no cita documentos. Cada escalón necesita su partida para quedar firme.</p>
+
+  <div class="gens">
+    <div class="gen key">
+      <div class="who"><h3>Crisóstomo Russy</h3><span class="yr">~1880</span><span class="pill warn">Por documentar</span></div>
+      <p>Casado con Herminia Morales (~1890). Sus padres no aparecen en el árbol, y no se sabe dónde nació. Ese dato decide si hay o no un italiano en la familia.</p>
+      <p class="todo"><b>Pedir:</b> bautismo (~1875–1885) y matrimonio (~1905–1915) en Santa Sofía, Sutamarchán, Moniquirá o Puente Nacional. Buscarlo también como Juan Crisóstomo. La partida dice “hijo legítimo de…” y, si fuera extranjero, “natural de…”.</p>
+    </div>
+    <div class="gen key">
+      <div class="who"><h3>Germán Russy Morales</h3><span class="yr">~1915</span><span class="pill warn">Por documentar</span></div>
+      <p>Casado con Rosa Ismenia Casallas Sáenz (~1920), hija de Alcides Casallas y Sara Sáenz. Sus hijos nacieron en Santa Sofía, así que la familia ya vivía allí.</p>
+      <p class="todo"><b>Pedir:</b> su bautismo (~1913–1918) y el matrimonio con Rosa Ismenia (~1940–1947), probablemente en la parroquia de Santa Sofía. El matrimonio dice dónde nació él y quiénes eran sus padres.</p>
+    </div>
+    <div class="gen">
+      <div class="who"><h3>Mérida y Germán Russy Casallas</h3><span class="yr">1947 · 1948</span><span class="pill ok">Con fecha</span></div>
+      <p>Hermanos de Kalman: Mérida el 25-jul-1947 y Germán el 17-dic-1948, ambos en Santa Sofía. Son los únicos escalones con fecha exacta.</p>
+      <p class="todo"><b>Pedir:</b> sus bautismos en la parroquia de Santa Sofía (Diócesis de Chiquinquirá). Las partidas colombianas suelen anotar a los abuelos paternos, lo que confirmaría a Crisóstomo y Herminia de una sola vez.</p>
+    </div>
+    <div class="gen key">
+      <div class="who"><h3>Kalman Russy Casallas</h3><span class="yr">vive</span><span class="pill warn">Sin fecha</span></div>
+      <p>No figura en el árbol público, probablemente por estar vivo. En 1999 aparecía en Bogotá como gerente de una oficina bancaria en el Chicó.</p>
+      <p class="todo"><b>Pedir:</b> su registro civil o cédula, para fijar año y lugar, y confirmar que sus padres son Germán y Rosa Ismenia.</p>
+    </div>
+    <div class="gen">
+      <div class="who"><h3>Russi coloniales de la zona</h3><span class="yr">~1735 · 1791</span><span class="pill no">Sin vínculo</span></div>
+      <p>Cristóbal Russi (~1735, casado con Salomé Roncancio) y Thomas Antonio Russi Velandia (Sutamarchán, 1791). Misma región, pero nadie ha probado el enlace. <b>Y hay una duda de fondo:</b> la misma fuente registra en esos años a un <span class="mono">Cristóbal de Ruxe Roncancio</span> — <i>Ruxe</i> es grafía antigua de <b>Ruge</b>, apellido real de la zona. El “Cristóbal Russi” de 1735 podría ser en realidad un Ruge mal transcrito, y entonces el ancla colonial de los Russy se cae.</p>
+      <p class="todo"><b>Para unirlos:</b> subir desde Crisóstomo con partidas, una generación por vez. Existe además un libro familiar, <i>Los Russi: remembranzas</i> (2023), que ubica a los primeros Russi en Chiquinquirá, Villa de Leyva y Sutamarchán.</p>
+    </div>
+  </div>
+
+  <div class="note acc">
+    <b>El doble apellido sostiene la cadena</b>
+    <span class="mono">Germán <b>Russy</b> <b>Morales</b></span> = padre Russy + madre Morales. <span class="mono">Kalman <b>Russy</b> <b>Casallas</b></span> = padre Russy + madre Casallas. Los nombres mismos confirman dos escalones, aunque falten las partidas.
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Cómo completarlo</div>
+  <h2>Dónde se piden las partidas</h2>
+  <p class="sub">En este orden, de mayor a menor rendimiento. La primera es la que más árbol destraba por una sola partida.</p>
+  <ol>
+    <li><b>Partidas de Togüí, en cadena.</b> Ya sabemos dónde buscar: bautismo de Luisa Delia, matrimonio de Pablo Emilio Roncancio con Eva Velandia, y los bautismos de ellos dos (~1895–1915). Cada partida nombra a los cuatro abuelos y trae notas marginales que apuntan a la siguiente.</li>
+    <li><b>Bautismos 1946–1950 de Mérida y Germán Russy Casallas</b>, Parroquia Santa Rosa de Lima, Santa Sofía. Las partidas nombran a los cuatro abuelos: confirma de golpe a Crisóstomo, Herminia, Alcides y Sara.</li>
+    <li><b>Matrimonio 1938–1947 de Germán Russy Morales y Rosa Ismenia Casallas Sáenz.</b> Da edades, vecindad y los padres de ambos.</li>
+    <li><b>Registro civil de Mérida y Germán (1947–48).</b> Desde la Ley 92 de 1938 esos nacimientos debían inscribirse ante notario o, si el municipio no tenía notaría, ante el alcalde, que remitía los libros a la notaría del círculo (Villa de Leyva o Chiquinquirá).</li>
+    <li><b>Bautismo 1915–1925 de Rosa Ismenia</b> y <b>matrimonio 1910–1922 de Alcides y Sara</b>, en Santa Sofía o en el municipio de donde ella viniera.</li>
+    <li><b>Bautismo 1875–1890 de Crisóstomo</b> y su matrimonio con Herminia (1905–1915), empezando por Sutamarchán, Parroquia Nuestra Señora de la Salud, que conserva libros desde 1556.</li>
+    <li><b>Índices notariales de Villa de Leyva 1893–1896</b>, publicados por la UPTC: son justo los años de la generación de Alcides y Crisóstomo. Hay que abrirlos a mano y buscar Casallas, Sáenz y Russy.</li>
+    <li><b>Buscar gratis en FamilySearch los bautismos de Pesca.</b> La colección “Colombia, registros parroquiales y diocesanos” se filmó de los mismos rollos del AGN y cubre Pesca entre 1602 y 1954. Hay que ir a la serie de <b>1904–1933</b> y buscar a María de la Columna entre 1913 y 1916, con dos años de margen. Cuesta $0.</li>
+    <li><b>Registro civil de nacimiento extemporáneo de María.</b> Nació antes de la Ley 92 de 1938, así que si alguna vez sacó cédula o pensión tuvo que registrarse de adulta, usando su partida de bautismo como prueba. <b>Ese registro sí consigna los nombres de los padres</b> (Decreto 1260, art. 52): es el documento más valioso de toda la rama. Se pide a la Registraduría Municipal de Pesca y a la Notaría Única de Pesca.</li>
+    <li><b>Registro civil de defunción de 2009</b> — $18.750 en línea o $10.800 presencial. <b>Ojo: no trae los nombres de los padres</b> (Decreto 1260, art. 80). Sirve para otra cosa: da la cédula, la oficina donde se inscribió y el <b>folio del registro de nacimiento</b>, que es el hilo hacia el documento anterior. Pidan también el certificado de defunción del DANE, que reposa en la misma oficina y suele traer más datos.</li>
+    <li><b>Si no saben la cédula de ella:</b> la consulta de cancelación de cédulas por muerte de la Registraduría es gratis y pública, y un derecho de petición (Ley 1755) acreditando el parentesco también sale gratis y devuelve cédula, oficina y serial.</li>
+    <li><b>Fe de bautismo de adulto de Luis Antonio.</b> Aunque sea de adulto, el canon 877 manda anotar padres, padrinos o testigos, y día y lugar de nacimiento. Los padres quedan por <b>declaración del propio bautizado</b>, así que no prueba filiación, pero puede ser el único papel donde aparezca escrito el nombre del padre.</li>
+    <li><b>Rollo 5 de Pesca en el AGN (1904–1933)</b>, solo si FamilySearch falla: reproducción digital por unos $220 a $540 por imagen más IVA, en tres días hábiles. El AGN también tiene microfilmados <b>46 rollos de la Notaría Única de Pesca</b>, donde podrían estar el registro tardío y la defunción.</li>
+    <li><b>Archivo de Bogotá, inhumaciones 1900–2000</b>, gratis: sirve para ubicar en qué notaría y parroquia quedaron Álvaro Méndez Cortés y Mary Mélida López antes de pedir sus partidas.</li>
+    <li><b>Matrimonio de Álvaro Méndez Cortés y Mary Mélida López</b> en Bogotá, y sus bautismos (~1920–1940), en la parroquia del barrio donde vivían.</li>
+  </ol>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Qué</th><th>Dónde</th><th>Cómo</th></tr></thead>
+      <tbody>
+        <tr><td>Bautismos y matrimonios de Santa Sofía</td><td>Parroquia <b>Santa Rosa de Lima</b>, Santa Sofía · Vicaría San Bartolomé, Diócesis de Chiquinquirá</td><td>Por teléfono o carta al despacho parroquial. Curato delimitado desde 1771; el municipio se llamó <b>Guatoque</b> hasta 1906, así que en libros viejos aparece con ese nombre. No está digitalizado.</td></tr>
+        <tr><td>Partidas de Sutamarchán</td><td>Parroquia Nuestra Señora de la Salud</td><td>Conserva libros desde 1556. Es la parroquia vecina con Russi documentados.</td></tr>
+        <tr><td>Registro civil de 1947–1948</td><td>Notaría del círculo (Villa de Leyva o Chiquinquirá) o archivo de la Alcaldía de Santa Sofía</td><td>Obligatorio desde la Ley 92 de 1938. Vía alterna si la parroquia no encuentra el libro.</td></tr>
+        <tr><td>Registros parroquiales digitalizados de Boyacá</td><td>FamilySearch, “Colombia, registros parroquiales y diocesanos, 1576–2014”</td><td>Gratis con cuenta, pero de esta zona solo están en línea <b>Villa de Leyva</b> y <b>Chiquinquirá</b>: ni Santa Sofía, ni Sutamarchán, ni Gachantivá, ni Moniquirá, ni Saboyá.</td></tr>
+        <tr><td>Registros civiles desde 1938</td><td>Registraduría o notaría de inscripción</td><td>En línea o presencial. Para Kalman y la generación de hoy.</td></tr>
+        <tr><td>Bautismos de Pesca (Boyacá)</td><td>Parroquia <b>Nuestra Señora del Rosario</b>, Pesca. La diócesis quedó en duda entre mis fuentes: Tunja o Duitama-Sogamoso — hay que confirmarlo llamando.</td><td>Los libros de Pesca están microfilmados en el <b>AGN en Bogotá</b>: 12 rollos, con bautismos desde <b>1602</b> hasta 1954, matrimonios 1840–1960 y defunciones 1822–1960. El rollo que cubre 1904–1933 es el del caso. Los mismos rollos se ven gratis en FamilySearch.</td></tr>
+        <tr><td>Partidas de Togüí</td><td>Parroquia <b>San Pablo</b>, Togüí · Vicaría San Mateo, Diócesis de Chiquinquirá</td><td>Los libros arrancan hacia 1821 y <b>no están digitalizados ni en el AGN ni en FamilySearch</b>. Solo existen allá. Curia de Chiquinquirá: Calle 16 #10-50, (608) 726 2017 / 320 848 5179.</td></tr>
+        <tr><td>Matrimonio de 1961 en Barbosa</td><td>Parroquia <b>Nuestra Señora del Carmen</b>, Barbosa (Santander), Calle 10 #8-39 · hoy Diócesis de Vélez</td><td>En 1961 Barbosa era de Socorro y San Gil. El acta nombra a los padres de ambos novios: confirma a Pablo Emilio y Eva, y abre la línea Estrada. Curia de Vélez: (7) 756 4840.</td></tr>
+        <tr><td>Notaría Única de Pesca</td><td>AGN, 46 rollos microfilmados</td><td>Ahí podrían estar el registro civil tardío de María y su defunción, si se inscribieron en Pesca.</td></tr>
+        <tr><td>Copias de registro civil</td><td>Registraduría, copia en línea</td><td>Unos $18.750 por copia (Resolución 1500 de 2026). Suelen pedir la cédula del titular. Antes de 1926 el registro civil iba dentro de los protocolos notariales.</td></tr>
+        <tr><td>Partidas de Bogotá (Méndez y López)</td><td>Parroquia donde ocurrió · Archivo Histórico de la Arquidiócesis de Bogotá</td><td>La Curia custodia libros antiguos (Las Nieves 1612–1933, Santa Bárbara, San Victorino). Para 1920–1940 lo más probable es que los libros sigan en la parroquia.</td></tr>
+        <tr><td>Notarías y protocolos coloniales de Boyacá</td><td>Archivo Histórico Regional de Boyacá (Tunja), 1540–1968</td><td>Digitalizado por Neogranadina y consultable en línea en zasqua.org — más de 10.000 documentos.</td></tr>
+        <tr><td>Matrimonios entre primos</td><td>Archivo diocesano correspondiente</td><td>Si Carlos Arturo y Luisa Delia eran primos, el expediente lleva dispensa de consanguinidad, que dibuja el árbol tres o cuatro generaciones atrás.</td></tr>
+        <tr><td>Quién armó el árbol en línea</td><td>genealogiasdecolombia.co, cuadernillo “Russy.pdf”</td><td>Se compra; sirve para ver de dónde salieron estos datos.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note">
+    <b>Ojo con los “primeros inmigrantes” de ese sitio</b>
+    genealogiasdecolombia.co afirma que el primer Velandia, el primer Roncancio y el primer Bernal fueron todos un “Francisco” nacido en España en 1550 con dos hijos. Es texto generado en serie, no un dato. Lo mismo pasó con el supuesto “Antonio Russi de 1845”. Sirven las fichas de personas concretas; no sirven los párrafos de origen.
+  </div>
+
+  <div class="note">
+    <b>Al pedir una partida, lleve tres datos</b>
+    Nombre completo con las dos grafías (Russi y Russy), año aproximado con margen de ±5 años, y el parentesco que justifica la consulta. Si el año es incierto, pida el libro de bautismos de ese rango y revise enero: a San Juan Crisóstomo se le celebraba el 27 de enero.
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Siguiente tanda</div>
+  <h2>Lo que solo la familia puede responder</h2>
+  <ul class="asks">
+    <li><b>Los nombres del centro.</b>Los hijos y los hermanos de Viviana, con fechas y ciudades.</li>
+    <li><b>Los Velandia.</b>Segundo apellido de Gloria, su año y ciudad, y de qué municipio venían Carlos Arturo y Luisa Delia. Si alguien sabe los nombres de los padres de ellos, se sube otra generación.</li>
+    <li><b>Tu rama paterna.</b>Año y parroquia de María de la Columna en Pesca, y de dónde sale el nombre de José Roa: ¿quién lo contó y cuándo?</li>
+    <li><b>Los Méndez y los López.</b>Años y barrios o parroquias de Bogotá de Álvaro y Mary Mélida, y los nombres de sus padres.</li>
+    <li><b>¿En qué año nació Kalman y cuántos hermanos fueron?</b>El árbol público solo lista dos.</li>
+    <li><b>¿Alguien sabe de qué pueblo era Crisóstomo?</b>Es el escalón que define si hay un italiano en el árbol.</li>
+    <li><b>¿Hay papeles en casa?</b>Partidas viejas, cédulas, escrituras de tierras, misales con fechas, fotos con nombres al reverso.</li>
+  </ul>
+  <p style="margin-top:20px">Lo que salga de partidas también alimenta el <a href="https://claude.ai/code/artifact/a28a9292-4d7d-4b2d-8b6f-df118c939ff6">Expediente Russi</a>, donde está el análisis de la ciudadanía italiana.</p>
+</section>
+</div>
+
+<footer>Rama Russy tomada de genealogiasdecolombia.co (árbol compilado, sin partidas citadas) y del archivo de El Tiempo. Mientras no haya partidas originales, todo el árbol es una hipótesis de trabajo, no una prueba.</footer>
+
+</body>
+</html>
